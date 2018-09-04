@@ -1,7 +1,11 @@
 <resources>
-    <string name="app_name">Event</string>
+    <string name="app_name">Matchmore Festival</string>
 
-    <string name="title_activity_create_cluster">Set up a cluster</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="name_editText">Enter your name</string>
+    <string name="title_cluster">Create a cluster</string>
+    <string name="title_activity_create_cluster">Create a cluster</string>
+    <string name="cluster_id">Your cluster ID is: </string>
+    <string name="share_cluster_id">Share the number above with your friends</string>
+    <string name="join_cluster">Or join your friend's cluster</string>
+    <string name="member_cluster">Members of your cluster</string>
 </resources>

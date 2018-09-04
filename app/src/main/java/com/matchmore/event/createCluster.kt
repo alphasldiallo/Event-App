@@ -1,20 +1,34 @@
 package com.matchmore.event
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import android.util.Log
 import android.view.View
-import kotlinx.android.synthetic.main.createcluster.*
+import android.widget.Button
+import android.widget.EditText
 
 class createCluster : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.createcluster)
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        //fullscreen()
 
+        val name = findViewById(R.id.name) as EditText
+        val next = findViewById(R.id.next) as Button
+
+
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+
+        next.setOnClickListener()
+        {
+            val nameVal:String = name.text.toString()
+            intent.setClass(this, generateClusterId::class.java)
+            intent.putExtra("name", nameVal )
+            startActivity(intent)
+        }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
