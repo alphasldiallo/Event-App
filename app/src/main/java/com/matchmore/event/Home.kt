@@ -14,18 +14,24 @@ class Home : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_home)
-        val read = findViewById(R.id.findFriends) as Button
+        val findFriend = findViewById(R.id.findFriends) as Button
+        val touring = findViewById(R.id.touringGuide) as Button
         val touringGuide = findViewById(R.id.touringGuide) as? Button
 
         hideSystemUI()
         var intent = Intent ()
 
-        read.setOnClickListener()
+        findFriend.setOnClickListener()
         {
             intent.setClass(this, createCluster::class.java)
             startActivity(intent)
         }
 
+        touring.setOnClickListener()
+        {
+            intent.setClass(this, beacon::class.java)
+            startActivity(intent)
+        }
 
 
     }

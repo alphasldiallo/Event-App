@@ -7,16 +7,16 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.ArrayAdapter
-import android.widget.ListView
-import android.widget.TextView
-import android.widget.Toast
+import android.widget.*
 import com.gun0912.tedpermission.PermissionListener
 import io.matchmore.sdk.api.models.Publication
 import java.util.*
 import io.matchmore.sdk.Matchmore
 import com.gun0912.tedpermission.TedPermission
+import io.matchmore.sdk.api.models.MatchmoreLocation
+import io.matchmore.sdk.api.models.Subscription
 import kotlinx.android.synthetic.main.createcluster.*
+import kotlin.collections.HashMap
 
 class generateClusterId : AppCompatActivity() {
 
@@ -24,7 +24,7 @@ class generateClusterId : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_generate_cluster_id)
 
-        val API_KEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJhbHBzIiwic3ViIjoiMGM3NDgzNDMtZWQ1Mi00NjYzLWE1NjgtZjJkYTQ2ZWVjNmEyIiwiYXVkIjpbIlB1YmxpYyJdLCJuYmYiOjE1MzMwMjk2MjIsImlhdCI6MTUzMzAyOTYyMiwianRpIjoiMSJ9.L1myrQR795WcAC8k8PZ-7cX-Jx3IhJnYVgpOmx9IQrd3yjWQPJkkUfFMe73-zBUfDXrqlcno4J-aGjRyq2LN_w"
+        val API_KEY = "eyJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJpc3MiOiJhbHBzIiwic3ViIjoiNjQyZDJmOTktZTcxYS00NzA5LWJmMWYtZjhkZWFkY2Q3OGE1IiwiYXVkIjpbIlB1YmxpYyJdLCJuYmYiOjE1MzIwMDQwMjgsImlhdCI6MTUzMjAwNDAyOCwianRpIjoiMSJ9.EWvR_yTClTvc7nT-avTitW7doImVE0Il7zjM5gEf1LIjKxyAi4ADj0bDpt2XZvUAH9lfAkVEtXiAYjCjc9wApA"
         if (!Matchmore.isConfigured())
         {
             Matchmore.config(this,API_KEY,false)
@@ -42,7 +42,14 @@ class generateClusterId : AppCompatActivity() {
 
         Log.d("debug", "Name = "+name)
         clusterId.setText(id.toString())
+
+        //Propagate the cluster ID
         createPub(id, name)
+
+        //Get the information of the users who subscribed
+        createSub(id)
+
+
         getMatches(name)
 
 
@@ -57,13 +64,35 @@ class generateClusterId : AppCompatActivity() {
     {
         Matchmore.instance.apply {
             startUsingMainDevice ({ device ->
+
                 Log.d("debug","Currently using Device "+device.name)
+
                 val pub = Publication("cluster", 500.0, 180.0)
-                pub.properties = hashMapOf("created_by" to title.toString(), "room_number" to i.toString())
+                pub.properties = hashMapOf("created_by" to n, "room_number" to i.toString())
                 createPublicationForMainDevice(pub,
                         { result ->
-                            Log.d("debug","Publication made successfully with topic "+pub.topic.toString())
+
+                            Log.d("debug","Publication made successfully with properties "+pub.properties.toString())
                         }, Throwable::printStackTrace)
+            }, Throwable::printStackTrace)
+        }
+    }
+
+    private fun createSub(i: Int)
+    {
+        Log.d ("debug", "createSub")
+        Matchmore.instance.apply {
+            startUsingMainDevice ({ d ->
+                //Log.d("debug", "location_sub "+d.location.toString())
+                Log.d("debug", "location_sub "+Matchmore.instance.locationManager.lastLocation.toString())
+                val subscription = Subscription("cluster_joined_"+i.toString(), 500.0, 180.0)
+
+
+                Log.d("debug", subscription.selector.toString())
+                createSubscriptionForMainDevice(subscription, { result ->
+                    Log.d("debug", "Subscription made successfully with topic ${result.topic}")
+
+                }, Throwable::printStackTrace)
             }, Throwable::printStackTrace)
         }
     }
@@ -74,9 +103,13 @@ class generateClusterId : AppCompatActivity() {
 
         // Empty Array that will used to store the properties of the publications
         var rsl: ArrayList<String> = ArrayList()
+        var buddy: String
+        var buddy_location: String
+        var location:HashMap<String, String> = HashMap <String, String>()
 
         Log.d("debug", "Check matches")
         rsl.add(name)
+
 
         Matchmore.instance.apply {
 
@@ -88,13 +121,37 @@ class generateClusterId : AppCompatActivity() {
 
                 val first = matches.first()
 
+                Log.d("debug", "Matches = "+first.publication!!.properties["location"].toString())
                 //Let's fill our Array with the properties of the publication
-                rsl.add(first.publication!!.properties["content"].toString())
+                buddy = first.publication!!.properties["created_by"].toString()
+
+                buddy_location = first.publication!!.properties["location"].toString()
+
+
+                rsl.add(buddy)
+
+                location.put(buddy, buddy_location)
+
+
+                var adapter = ArrayAdapter(this@generateClusterId, android.R.layout.simple_list_item_1, rsl)
+                listView.adapter = adapter as ListAdapter?
+
+                val findBtn = findViewById(R.id.generate_find_btn) as Button
+
+                findBtn.setOnClickListener()
+                {
+                    intent.setClass(this@generateClusterId, live::class.java)
+                    intent.putExtra("data", location)
+                    Log.d("debug", "location = "+location.toString())
+                    startActivity(intent)
+                }
+
+
+
             }
-            matchMonitor.startPollingMatches(1000)
+            matchMonitor.startPollingMatches(100)
         }
-        val adapter = ArrayAdapter(this@generateClusterId, android.R.layout.simple_list_item_1, rsl)
-        listView.adapter = adapter
+
     }
 
     private fun fullscreen() {
@@ -114,6 +171,7 @@ class generateClusterId : AppCompatActivity() {
                 Matchmore.instance.apply {
                     startUpdatingLocation()
                     startRanging()
+
                 }
             }
 

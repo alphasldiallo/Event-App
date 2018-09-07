@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 
 class createCluster : AppCompatActivity() {
 
@@ -17,6 +18,7 @@ class createCluster : AppCompatActivity() {
 
         val name = findViewById(R.id.name) as EditText
         val next = findViewById(R.id.next) as Button
+        val join = findViewById(R.id.joinBtn) as Button
 
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -24,10 +26,32 @@ class createCluster : AppCompatActivity() {
 
         next.setOnClickListener()
         {
+            val nameVal: String = name.text.toString()
+            Log.d("debug", nameVal)
+            if (!nameVal.equals("")) {
+                intent.setClass(this, generateClusterId::class.java)
+                intent.putExtra("name", nameVal)
+                startActivity(intent)
+            }
+            else
+            {
+                Toast.makeText(this@createCluster, "The name should be filed", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        join.setOnClickListener()
+        {
             val nameVal:String = name.text.toString()
-            intent.setClass(this, generateClusterId::class.java)
-            intent.putExtra("name", nameVal )
-            startActivity(intent)
+
+            if (!nameVal.equals("")) {
+                intent.setClass(this, joinCluster::class.java)
+                intent.putExtra("name", nameVal)
+                startActivity(intent)
+            }
+            else
+            {
+                Toast.makeText(this@createCluster, "The name should be filed", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 

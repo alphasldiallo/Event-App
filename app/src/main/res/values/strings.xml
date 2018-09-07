@@ -8,4 +8,7 @@
     <string name="share_cluster_id">Share the number above with your friends</string>
     <string name="join_cluster">Or join your friend's cluster</string>
     <string name="member_cluster">Members of your cluster</string>
+    <string name="join_friends_cluster">Join your friend's cluster by entering their ID</string>
+    <string name="cluster_number">Cluster's number</string>
+    <string name="title_activity_live">Go live!</string>
 </resources>
